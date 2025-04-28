@@ -1,3 +1,4 @@
+import { Guest } from "../models/guest.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -36,3 +37,47 @@ export const avoidInProduction = asyncHandler(async (req, res, next) => {
     );
   }
 });
+
+export const guestLimiter = async (req, res, next) => {
+  try {
+    if (req.user) {
+      return next(); // Logged in users -> skip
+    }
+
+    const guestId = req.ip; // (or you can generate token and store in client cookie for better tracking)
+
+    let guest = await Guest.findOne({ guestId });
+
+    if (!guest) {
+      guest = await Guest.create({ guestId, queryCount: 0 });
+    }
+
+    const now = new Date();
+    const lastReset = guest.lastReset || now;
+    const isSameDay = now.toDateString() === lastReset.toDateString();
+
+    if (!isSameDay) {
+      guest.queryCount = 0;
+      guest.lastReset = now;
+    }
+
+    if (guest.queryCount >= 20) {
+      return res.status(429).json({
+        success: false,
+        message:
+          "Daily guest query limit reached. Please sign up for unlimited access!",
+      });
+    }
+
+    guest.queryCount += 1;
+    await guest.save();
+
+    next(); // allow the request to continue
+  } catch (error) {
+    console.error("Guest limiter error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while checking guest limits.",
+    });
+  }
+};

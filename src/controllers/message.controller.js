@@ -99,7 +99,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   const geminiResponse = await generateGeminiResponse(query);
 
   const receivedMessage = await Message.create({
-    chatId: new mongoose.Types.ObjectId(),
+    chatId: new mongoose.Types.ObjectId(chatId),
     content: geminiResponse,
     role: "assistant",
   });
@@ -111,4 +111,20 @@ const sendMessage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, receivedMessage, "Message saved successfully"));
 });
 
-export { getAllMessages, sendMessage };
+const sendMessageGuest = asyncHandler(async (req, res) => {
+  const { query } = req.body;
+
+  if (!query) throw new ApiError(400, "Message query is required");
+
+  const geminiResponse = await generateGeminiResponse(query);
+
+  if (!geminiResponse) throw new ApiError(500, "Internal server error");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, geminiResponse || "", "Message saved successfully")
+    );
+});
+
+export { getAllMessages, sendMessage, sendMessageGuest };

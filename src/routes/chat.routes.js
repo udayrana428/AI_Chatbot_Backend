@@ -14,8 +14,6 @@ const router = express.Router();
 
 router.use(verifyJWT);
 
-router.route("/private/:receiverId").post(createOrGetPrivateChat);
-
 // ++++++++++++++++++++++
 
 router.route("/createChat").post(createChat);
