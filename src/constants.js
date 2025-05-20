@@ -6,6 +6,13 @@ export const UserLoginTypeEnum = {
 
 export const AvailableSocialLogins = Object.values(UserLoginTypeEnum);
 
+export const UserRolesEnum = {
+  ADMIN: "ADMIN",
+  USER: "USER",
+};
+
+export const AvailableUserRoles = Object.values(UserRolesEnum);
+
 export const DB_NAME = "Chatapp";
 
 export const ChatEventEnum = Object.freeze({

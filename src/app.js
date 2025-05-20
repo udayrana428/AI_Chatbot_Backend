@@ -72,6 +72,7 @@ app.get("/", (req, res) => {
 import userRouter from "./routes/user.routes.js";
 import chatRouter from "./routes/chat.routes.js";
 import messageRouter from "./routes/message.routes.js";
+import ingestRouter from "./routes/ingest.routes.js";
 
 // Socket-io Initialization
 initializeSocketIO(io);
@@ -84,6 +85,9 @@ app.use("/api/v1/chats", chatRouter);
 
 // Message Route Declaration
 app.use("/api/v1/messages", messageRouter);
+
+// Ingest Route Declaration
+app.use("/api/v1/ingest", ingestRouter);
 
 // Final error handler for unhandled errors in middleware or non-asyncHandler routes
 app.use((err, req, res, next) => {

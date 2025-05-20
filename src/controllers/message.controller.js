@@ -8,6 +8,8 @@ import { emitSocketEvent } from "../socket/index.js";
 import { ChatEventEnum } from "../constants.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { generateGeminiResponse } from "../services/geminiService.js";
+import { parseGeminiResponseToJson } from "../utils/customParser.js";
+import { marked } from "marked";
 
 const chatMessageCommonAggregation = () => {
   return [
@@ -106,9 +108,13 @@ const sendMessage = asyncHandler(async (req, res) => {
 
   if (!receivedMessage) throw new ApiError(500, "Internal server error");
 
+  const parsedJsonMessage = await parseGeminiResponseToJson(receivedMessage);
+
   return res
     .status(201)
-    .json(new ApiResponse(201, receivedMessage, "Message saved successfully"));
+    .json(
+      new ApiResponse(201, parsedJsonMessage, "Message saved successfully")
+    );
 });
 
 const sendMessageGuest = asyncHandler(async (req, res) => {
@@ -120,10 +126,14 @@ const sendMessageGuest = asyncHandler(async (req, res) => {
 
   if (!geminiResponse) throw new ApiError(500, "Internal server error");
 
+  // const parsedJsonResponse = await parseGeminiResponseToJson(geminiResponse);
+  const rawParsedHtml = await marked.parse(geminiResponse);
+  const cleanParsedHtml = rawParsedHtml.replace(/\n/g, "");
+
   return res
     .status(200)
     .json(
-      new ApiResponse(200, geminiResponse || "", "Message saved successfully")
+      new ApiResponse(200, cleanParsedHtml || "", "Message saved successfully")
     );
 });
 

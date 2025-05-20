@@ -1,7 +1,12 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { AvailableSocialLogins, UserLoginTypeEnum } from "../constants.js";
+import {
+  AvailableSocialLogins,
+  AvailableUserRoles,
+  UserLoginTypeEnum,
+  UserRolesEnum,
+} from "../constants.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,6 +24,12 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
+    },
+    role: {
+      type: String,
+      enum: AvailableUserRoles,
+      default: UserRolesEnum.USER,
+      required: true,
     },
     password: {
       type: String,
@@ -57,8 +68,8 @@ userSchema.methods.generateAccessToken = async function () {
     {
       _id: this._id,
       email: this.email,
-      username: this.username,
       fullName: this.fullName,
+      role: this.role,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {

@@ -27,6 +27,17 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
   }
 });
 
+export const verifyPermission = (roles = []) =>
+  asyncHandler(async (req, res, next) => {
+    if (!req.user?._id) throw new ApiError(401, "Unauthorized request");
+
+    if (roles.includes(req.user?.role)) {
+      next();
+    } else {
+      throw new ApiError(403, "You are not allowed to perform this action");
+    }
+  });
+
 export const avoidInProduction = asyncHandler(async (req, res, next) => {
   if (process.env.NODE_ENV === "production") {
     next();
@@ -61,7 +72,7 @@ export const guestLimiter = async (req, res, next) => {
       guest.lastReset = now;
     }
 
-    if (guest.queryCount >= 20) {
+    if (guest.queryCount >= 30) {
       return res.status(429).json({
         success: false,
         message:
