@@ -11,37 +11,41 @@ const ai = new GoogleGenAI({
 // const model = ai.getGenerativeModel({ model: "gemini-1.5-pro" });
 
 // Function to get response from Embedding search
+// const generateGeminiResponse = async (query) => {
+//   const queryEmbedding = await generateEmbedding(query);
+
+//   // console.log("QueryEmbedding: ", queryEmbedding);
+
+//   // Perform similarity search on stored embeddings in MongoDB
+//   const embeddings = await PromptEmbedding.find();
+
+//   // Search for the most similar embedding (you can use cosine similarity)
+//   let bestMatch = null;
+//   let highestSimilarity = -1;
+
+//   for (const embeddingDoc of embeddings) {
+//     const similarity = calculateCosineSimilarity(
+//       queryEmbedding,
+//       embeddingDoc.embeddings
+//     );
+//     if (similarity > highestSimilarity) {
+//       highestSimilarity = similarity;
+//       bestMatch = embeddingDoc;
+//     }
+//   }
+
+//   if (bestMatch && highestSimilarity > 0.65) {
+//     // Return the content from the best match if similarity is above a threshold
+//     return bestMatch.content;
+//   } else {
+//     // Fallback to Google Gemini if no relevant match is found
+//     return getFallbackResponse(query);
+//     // return;
+//   }
+// };
+
 const generateGeminiResponse = async (query) => {
-  const queryEmbedding = await generateEmbedding(query);
-
-  // console.log("QueryEmbedding: ", queryEmbedding);
-
-  // Perform similarity search on stored embeddings in MongoDB
-  const embeddings = await PromptEmbedding.find();
-
-  // Search for the most similar embedding (you can use cosine similarity)
-  let bestMatch = null;
-  let highestSimilarity = -1;
-
-  for (const embeddingDoc of embeddings) {
-    const similarity = calculateCosineSimilarity(
-      queryEmbedding,
-      embeddingDoc.embeddings
-    );
-    if (similarity > highestSimilarity) {
-      highestSimilarity = similarity;
-      bestMatch = embeddingDoc;
-    }
-  }
-
-  if (bestMatch && highestSimilarity > 0.65) {
-    // Return the content from the best match if similarity is above a threshold
-    return bestMatch.content;
-  } else {
-    // Fallback to Google Gemini if no relevant match is found
-    return getFallbackResponse(query);
-    // return;
-  }
+  return getFallbackResponse(query);
 };
 
 // Function to get a fallback response from Google Gemini

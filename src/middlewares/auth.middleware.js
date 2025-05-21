@@ -72,7 +72,7 @@ export const guestLimiter = async (req, res, next) => {
       guest.lastReset = now;
     }
 
-    if (guest.queryCount >= 30) {
+    if (guest.queryCount >= 20) {
       return res.status(429).json({
         success: false,
         message:
